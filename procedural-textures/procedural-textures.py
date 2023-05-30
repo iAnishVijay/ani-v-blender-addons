@@ -10,7 +10,7 @@ bl_info = {
 
 import bpy
 
-class OBJECT_PT_procedural_textures(bpy.types.Panel):
+class OBJECT_OT_procedural_textures(bpy.types.Panel):
   def execute(self, context):
         
     return {'FINISHED'}
