@@ -1,3 +1,5 @@
+# Generates a random wave like path on the X-axis, length, amplitude and segments of the path are customizable.
+
 bl_info = {
     "name": "Generate Wave Path",
     "author": "Ani V.",
