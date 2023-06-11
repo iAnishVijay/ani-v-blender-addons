@@ -5,7 +5,8 @@ Below you can read about each addon and what it does:
 
 -   Add studio lightings:
 
-    - Adds area lights to the scene for quick renders.
+        - Adds area lights to the scene for quick renders.
 
 - Generate wave path:
-    - Generates a wave like curve path with customizable amplitude value.
+        
+        - Generates a wave like curve path with customizable amplitude value.
