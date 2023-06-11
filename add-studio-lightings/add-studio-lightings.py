@@ -1,6 +1,3 @@
-# idk how any of this works...i generated this using ChatGPT.
-# but in short it adds 3 area ligts to give some studio like lightings to render game assets.
-
 bl_info = {
     "name": "Studio Lighting Addon",
     "author": "Ani V.",
