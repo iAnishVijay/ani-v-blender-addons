@@ -27,8 +27,8 @@ class RockPlacementPanel(bpy.types.Panel):
         scene = context.scene
 
         # Rock Collection selection
-        layout.label(text="Rock Collection:")
-        layout.prop_search(scene, "rock_collection", bpy.data, "collections", text="")
+        layout.label(text="Spawnable Collection:")
+        layout.prop_search(scene, "spawnable_collection", bpy.data, "collections", text="")
 
         # Target Mesh selection
         layout.label(text="Target Mesh:")
@@ -37,7 +37,7 @@ class RockPlacementPanel(bpy.types.Panel):
         row.operator("object.select_target_mesh", text="", icon='EYEDROPPER')
 
         # Placement button
-        layout.operator("object.place_rocks", text="Place Rocks")
+        layout.operator("object.place_rocks", text="Place Objects")
 
 # Operator class for selecting target mesh
 class SelectTargetMeshOperator(bpy.types.Operator):
@@ -66,9 +66,9 @@ class PlaceRocksOperator(bpy.types.Operator):
         scene = context.scene
 
         # Get the selected rock collection
-        rock_collection_name = scene.rock_collection
-        rock_collection = bpy.data.collections.get(rock_collection_name)
-        if not rock_collection:
+        spawnable_collection_name = scene.spawnable_collection
+        spawnable_collection = bpy.data.collections.get(spawnable_collection_name)
+        if not spawnable_collection:
             self.report({'ERROR'}, "Rock collection not found.")
             return {'CANCELLED'}
 
@@ -83,16 +83,21 @@ class PlaceRocksOperator(bpy.types.Operator):
         num_rocks = 50
 
         # Clear the parent of the rocks in the collection
-        for rock in rock_collection.objects:
+        for rock in spawnable_collection.objects:
             rock.parent = None
 
         # Get the vertices of the target mesh
         target_vertices = [v.co for v in target_mesh.data.vertices]
 
+        # Create a new collection with the same name as the target mesh
+        collection_name = target_mesh.name
+        new_collection = bpy.data.collections.new(collection_name)
+        bpy.context.scene.collection.children.link(new_collection)
+
         # Randomly place rocks on the target mesh
         for _ in range(num_rocks):
             # Select a random rock from the collection
-            rock = random.choice(rock_collection.objects)
+            rock = random.choice(spawnable_collection.objects)
 
             # Randomly select a vertex from the target mesh
             vertex = random.choice(target_vertices)
@@ -109,8 +114,11 @@ class PlaceRocksOperator(bpy.types.Operator):
             # Parent the instance to the target mesh
             instance.parent = target_mesh
 
-            # Link the instance to the scene
-            bpy.context.collection.objects.link(instance)
+            # Link the instance to the new collection
+            new_collection.objects.link(instance)
+
+        # Add the target mesh to the new collection
+        new_collection.objects.link(target_mesh)
 
         # Update the scene to reflect the changes
         bpy.context.view_layer.update()
@@ -129,14 +137,14 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.rock_collection = bpy.props.StringProperty()
+    bpy.types.Scene.spawnable_collection = bpy.props.StringProperty()
     bpy.types.Scene.target_mesh = bpy.props.StringProperty()
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
-    del bpy.types.Scene.rock_collection
+    del bpy.types.Scene.spawnable_collection
     del bpy.types.Scene.target_mesh
 
 # Run the script
