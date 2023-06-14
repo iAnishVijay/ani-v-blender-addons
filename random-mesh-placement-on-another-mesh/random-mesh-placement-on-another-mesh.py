@@ -86,8 +86,8 @@ class PlaceObjectsOperator(bpy.types.Operator):
         num_objects = 50
 
         # Clear the parent of the objects in the collection
-        for rock in spawnable_collection.objects:
-            rock.parent = None
+        for spawnable_object in spawnable_collection.objects:
+            spawnable_object.parent = None
 
         # Get the vertices of the target mesh
         target_vertices = [v.co for v in target_mesh.data.vertices]
@@ -100,14 +100,14 @@ class PlaceObjectsOperator(bpy.types.Operator):
         # Randomly place objects on the target mesh
         for _ in range(num_objects):
             # Select a random rock from the collection
-            rock = random.choice(spawnable_collection.objects)
+            spawnable_object = random.choice(spawnable_collection.objects)
 
             # Randomly select a vertex from the target mesh
             vertex = random.choice(target_vertices)
 
             # Create a new instance of the rock and set its location to the selected vertex
-            instance = rock.copy()
-            instance.data = rock.data.copy()
+            instance = spawnable_object.copy()
+            instance.data = spawnable_object.data.copy()
             instance.location = vertex
 
             # Set random rotation and scale for the instance
