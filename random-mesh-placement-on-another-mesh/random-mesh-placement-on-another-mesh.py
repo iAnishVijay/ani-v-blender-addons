@@ -26,7 +26,7 @@ class RockPlacementPanel(bpy.types.Panel):
 
         scene = context.scene
 
-        # Rock Collection selection
+        # object Collection selection
         layout.label(text="Spawnable Collection:")
         layout.prop_search(scene, "spawnable_collection", bpy.data, "collections", text="")
 
@@ -36,8 +36,11 @@ class RockPlacementPanel(bpy.types.Panel):
         row.prop_search(scene, "target_mesh", bpy.data, "objects", text="")
         row.operator("object.select_target_mesh", text="", icon='EYEDROPPER')
 
+        # Parenting checkbox
+        layout.prop(scene, "parent_objects", text="Parent Objects")
+
         # Placement button
-        layout.operator("object.place_rocks", text="Place Objects")
+        layout.operator("object.place_objects", text="Place Objects")
 
 # Operator class for selecting target mesh
 class SelectTargetMeshOperator(bpy.types.Operator):
@@ -55,21 +58,21 @@ class SelectTargetMeshOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
-# Operator class for placing rocks
-class PlaceRocksOperator(bpy.types.Operator):
-    bl_idname = "object.place_rocks"
-    bl_label = "Place Rocks"
+# Operator class for placing objects
+class PlaceObjectsOperator(bpy.types.Operator):
+    bl_idname = "object.place_objects"
+    bl_label = "Place Objects"
     bl_options = {'REGISTER', 'UNDO'}
 
     # Execute the placement
     def execute(self, context):
         scene = context.scene
 
-        # Get the selected rock collection
+        # Get the selected object collection
         spawnable_collection_name = scene.spawnable_collection
         spawnable_collection = bpy.data.collections.get(spawnable_collection_name)
         if not spawnable_collection:
-            self.report({'ERROR'}, "Rock collection not found.")
+            self.report({'ERROR'}, "Object collection not found.")
             return {'CANCELLED'}
 
         # Get the selected target mesh
@@ -79,10 +82,10 @@ class PlaceRocksOperator(bpy.types.Operator):
             self.report({'ERROR'}, "Target mesh object not found or not a mesh.")
             return {'CANCELLED'}
 
-        # Set the number of rocks to place
+        # Set the number of objects to place
         num_rocks = 50
 
-        # Clear the parent of the rocks in the collection
+        # Clear the parent of the objects in the collection
         for rock in spawnable_collection.objects:
             rock.parent = None
 
@@ -94,7 +97,7 @@ class PlaceRocksOperator(bpy.types.Operator):
         new_collection = bpy.data.collections.new(collection_name)
         bpy.context.scene.collection.children.link(new_collection)
 
-        # Randomly place rocks on the target mesh
+        # Randomly place objects on the target mesh
         for _ in range(num_rocks):
             # Select a random rock from the collection
             rock = random.choice(spawnable_collection.objects)
@@ -108,11 +111,20 @@ class PlaceRocksOperator(bpy.types.Operator):
             instance.location = vertex
 
             # Set random rotation and scale for the instance
-            instance.rotation_euler = (random.uniform(0, 2*math.pi), random.uniform(0, 2*math.pi), random.uniform(0, 2*math.pi))
-            instance.scale = (random.uniform(0.5, 2), random.uniform(0.5, 2), random.uniform(0.5, 2))
+            instance.rotation_euler = (
+                random.uniform(0, 2*math.pi),
+                random.uniform(0, 2*math.pi),
+                random.uniform(0, 2*math.pi)
+            )
+            instance.scale = (
+                random.uniform(0.5, 2),
+                random.uniform(0.5, 2),
+                random.uniform(0.5, 2)
+            )
 
-            # Parent the instance to the target mesh
-            instance.parent = target_mesh
+            # Parent the instance to the target mesh if the checkbox is toggled
+            if scene.parent_objects:
+                instance.parent = target_mesh
 
             # Link the instance to the new collection
             new_collection.objects.link(instance)
@@ -123,14 +135,14 @@ class PlaceRocksOperator(bpy.types.Operator):
         # Update the scene to reflect the changes
         bpy.context.view_layer.update()
 
-        self.report({'INFO'}, "Rocks placed successfully.")
+        self.report({'INFO'}, "Objects placed successfully.")
         return {'FINISHED'}
 
 # Register the UI panel and operator
 classes = [
     RockPlacementPanel,
     SelectTargetMeshOperator,
-    PlaceRocksOperator,
+    PlaceObjectsOperator,
 ]
 
 def register():
@@ -139,6 +151,11 @@ def register():
 
     bpy.types.Scene.spawnable_collection = bpy.props.StringProperty()
     bpy.types.Scene.target_mesh = bpy.props.StringProperty()
+    bpy.types.Scene.parent_objects = bpy.props.BoolProperty(
+        name="Parent Objects",
+        description="Toggle parenting of objects to the target mesh",
+        default=True,
+    )
 
 def unregister():
     for cls in classes:
@@ -146,6 +163,7 @@ def unregister():
 
     del bpy.types.Scene.spawnable_collection
     del bpy.types.Scene.target_mesh
+    del bpy.types.Scene.parent_objects
 
 # Run the script
 if __name__ == "__main__":
