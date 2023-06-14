@@ -1,6 +1,7 @@
 import bpy
 import random
 import math
+from bpy.props import IntProperty
 
 bl_info = {
     "name": "Random Object Placement",
@@ -29,6 +30,10 @@ class RockPlacementPanel(bpy.types.Panel):
         # object Collection selection
         layout.label(text="Spawnable Collection:")
         layout.prop_search(scene, "spawnable_collection", bpy.data, "collections", text="")
+        
+        split = layout.split(factor=0.4)
+        split.label(text = "Objects count:")
+        split.prop(scene, "number_of_objects", text="")
 
         # Target Mesh selection
         layout.label(text="Target Mesh:")
@@ -83,7 +88,7 @@ class PlaceObjectsOperator(bpy.types.Operator):
             return {'CANCELLED'}
 
         # Set the number of objects to place
-        num_objects = 50
+        num_objects = scene.number_of_objects
 
         # Clear the parent of the objects in the collection
         for spawnable_object in spawnable_collection.objects:
@@ -156,6 +161,12 @@ def register():
         description="Toggle parenting of objects to the target mesh",
         default=True,
     )
+    bpy.types.Scene.number_of_objects = IntProperty(
+        name="Number of objects",
+        description="Number of objects to spawn",
+        default=10,
+        min=1
+    )
 
 def unregister():
     for cls in classes:
@@ -164,6 +175,7 @@ def unregister():
     del bpy.types.Scene.spawnable_collection
     del bpy.types.Scene.target_mesh
     del bpy.types.Scene.parent_objects
+    del bpy.types.Secne.number_of_objects
 
 # Run the script
 if __name__ == "__main__":
