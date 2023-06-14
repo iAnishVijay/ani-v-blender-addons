@@ -175,7 +175,7 @@ def unregister():
     del bpy.types.Scene.spawnable_collection
     del bpy.types.Scene.target_mesh
     del bpy.types.Scene.parent_objects
-    del bpy.types.Secne.number_of_objects
+    del bpy.types.Scene.number_of_objects
 
 # Run the script
 if __name__ == "__main__":
