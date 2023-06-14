@@ -83,7 +83,7 @@ class PlaceObjectsOperator(bpy.types.Operator):
             return {'CANCELLED'}
 
         # Set the number of objects to place
-        num_rocks = 50
+        num_objects = 50
 
         # Clear the parent of the objects in the collection
         for rock in spawnable_collection.objects:
@@ -98,7 +98,7 @@ class PlaceObjectsOperator(bpy.types.Operator):
         bpy.context.scene.collection.children.link(new_collection)
 
         # Randomly place objects on the target mesh
-        for _ in range(num_rocks):
+        for _ in range(num_objects):
             # Select a random rock from the collection
             rock = random.choice(spawnable_collection.objects)
 
