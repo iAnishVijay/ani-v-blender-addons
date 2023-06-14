@@ -14,7 +14,7 @@ bl_info = {
 }
 
 # UI panel class
-class RockPlacementPanel(bpy.types.Panel):
+class ObjectPlacementPanel(bpy.types.Panel):
     bl_label = "Random Object Placement"
     bl_idname = "OBJECT_PT_rock_placement_panel"
     bl_space_type = "VIEW_3D"
@@ -145,7 +145,7 @@ class PlaceObjectsOperator(bpy.types.Operator):
 
 # Register the UI panel and operator
 classes = [
-    RockPlacementPanel,
+    ObjectPlacementPanel,
     SelectTargetMeshOperator,
     PlaceObjectsOperator,
 ]
